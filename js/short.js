@@ -1,292 +1,365 @@
 /**
- * short.js - A concise JavaScript utility library for DOM manipulation and common tasks.
- * Designed for easy integration via CDN (e.g., jsDelivr).
+ * short.js - A comprehensive, concise JavaScript utility library for web development.
+ * Designed by SS RITESH for easy integration via CDN (e.g., jsDelivr).
  *
  * This script provides shorthand functions to simplify common JavaScript operations,
  * making your code more readable and efficient.
  *
  * Usage:
- * Include this script in your HTML:
+ * Include this script in your HTML (replace with your actual CDN link):
  * <script src="https://cdn.jsdelivr.net/gh/riteshfilmscreation/RFC-Web-Code/js/short.js"></script>
  *
- * Then, use the functions via the global `short` object:
- * short.qs('.my-element');
- * short.on(button, 'click', handleClick);
- * short.log('Hello', 'World');
+ * Then, use the functions via the global `shortjs` object:
+ * shortjs.qs('.my-element');
+ * shortjs.on(button, 'click', handleClick);
+ * shortjs.lsSet('user', { name: 'Alice' });
  */
-
 (function() {
     "use strict";
+    const shortjs = {};
 
-    // Define a global object to expose our utility functions
-    const short = {};
-
-    /**
-     * ======================================
-     * 1. DOM Selection Utilities
-     * ======================================
-     */
-
-    /**
-     * Selects the first element that matches the specified CSS selector.
-     * @param {string} selector - The CSS selector string.
-     * @param {Element|Document} [context=document] - The element or document to search within.
-     * @returns {Element|null} The first matching element, or null if none found.
-     */
-    short.qs = function(selector, context = document) {
-        return context.querySelector(selector);
-    };
-
-    /**
-     * Selects all elements that match the specified CSS selector.
-     * @param {string} selector - The CSS selector string.
-     * @param {Element|Document} [context=document] - The element or document to search within.
-     * @returns {NodeListOf<Element>} A static NodeList containing all matching elements.
-     */
-    short.qsa = function(selector, context = document) {
-        return context.querySelectorAll(selector);
-    };
-
-    /**
-     * Selects an element by its ID.
-     * @param {string} id - The ID of the element to select.
-     * @returns {Element|null} The element with the specified ID, or null if not found.
-     */
-    short.id = function(id) {
-        return document.getElementById(id);
-    };
-
-    /**
-     * ======================================
-     * 2. DOM Manipulation Utilities
-     * ======================================
-     */
-
-    /**
-     * Creates a new HTML element with optional attributes and children.
-     * @param {string} tagName - The tag name of the element to create (e.g., 'div', 'p', 'span').
-     * @param {Object} [attributes={}] - An object where keys are attribute names and values are attribute values.
-     * @param {Array<Node|string>} [children=[]] - An array of child nodes or strings (which will be converted to text nodes).
-     * @returns {Element} The newly created element.
-     */
-    short.create = function(tagName, attributes = {}, children = []) {
-        const el = document.createElement(tagName);
-        for (const key in attributes) {
-            if (attributes.hasOwnProperty(key)) {
-                el.setAttribute(key, attributes[key]);
-            }
-        }
-        children.forEach(child => {
-            if (typeof child === 'string') {
-                el.appendChild(document.createTextNode(child));
-            } else if (child instanceof Node) {
-                el.appendChild(child);
-            }
-        });
+    // I. DOM Selection & Manipulation
+    shortjs.qs = (s, c = document) => c.querySelector(s);
+    shortjs.qsa = (s, c = document) => c.querySelectorAll(s);
+    shortjs.id = (i) => document.getElementById(i);
+    shortjs.create = (t, a = {}, ch = []) => {
+        const el = document.createElement(t);
+        for (const k in a) el.setAttribute(k, a[k]);
+        ch.forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
         return el;
     };
+    shortjs.append = (p, c) => p && c && p.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    shortjs.prepend = (p, c) => p && c && p.prepend(typeof c === 'string' ? document.createTextNode(c) : c);
+    shortjs.before = (el, c) => el && c && el.parentNode && el.parentNode.insertBefore(typeof c === 'string' ? document.createTextNode(c) : c, el);
+    shortjs.after = (el, c) => el && c && el.parentNode && el.parentNode.insertBefore(typeof c === 'string' ? document.createTextNode(c) : c, el.nextSibling);
+    shortjs.replace = (o, n) => o && n && o.parentNode && o.parentNode.replaceChild(typeof n === 'string' ? document.createTextNode(n) : n, o);
+    shortjs.remove = (el) => el && el.parentNode && el.parentNode.removeChild(el);
+    shortjs.html = (el, c) => c === undefined ? (el ? el.innerHTML : '') : (el && (el.innerHTML = c));
+    shortjs.text = (el, c) => c === undefined ? (el ? el.textContent : '') : (el && (el.textContent = c));
+    shortjs.attr = (el, n, v) => v === undefined ? (el ? el.getAttribute(n) : null) : (el && el.setAttribute(n, v));
+    shortjs.removeAttr = (el, n) => el && el.removeAttribute(n);
+    shortjs.css = (el, p, v) => {
+        if (!el) return;
+        if (typeof p === 'object') { for (const k in p) el.style[k] = p[k]; } else if (v === undefined) return el.style[p] || getComputedStyle(el)[p];
+        else el.style[p] = v;
+    };
+    shortjs.addClass = (el, c) => el && el.classList.add(...(Array.isArray(c) ? c : [c]));
+    shortjs.removeClass = (el, c) => el && el.classList.remove(...(Array.isArray(c) ? c : [c]));
+    shortjs.toggleClass = (el, c, f) => el ? el.classList.toggle(c, f) : false;
+    shortjs.hasClass = (el, c) => el ? el.classList.contains(c) : false;
+    shortjs.parent = (el) => el ? el.parentNode : null;
+    shortjs.children = (el) => el ? Array.from(el.children) : [];
+    shortjs.siblings = (el) => el ? Array.from(el.parentNode.children).filter(child => child !== el) : [];
+    shortjs.data = (el, k, v) => v === undefined ? (el ? el.dataset[k] : null) : (el && (el.dataset[k] = v));
+    shortjs.offset = (el) => el ? { top: el.getBoundingClientRect().top + window.pageYOffset, left: el.getBoundingClientRect().left + window.pageXOffset } : { top: 0, left: 0 };
+    shortjs.position = (el) => el ? { top: el.offsetTop, left: el.offsetLeft } : { top: 0, left: 0 };
+    shortjs.width = (el, includePadding = false, includeBorder = false, includeMargin = false) => {
+        if (!el) return 0;
+        let width = el.offsetWidth;
+        if (includePadding) width += parseFloat(shortjs.css(el, 'paddingLeft')) + parseFloat(shortjs.css(el, 'paddingRight'));
+        if (includeBorder) width += parseFloat(shortjs.css(el, 'borderLeftWidth')) + parseFloat(shortjs.css(el, 'borderRightWidth'));
+        if (includeMargin) width += parseFloat(shortjs.css(el, 'marginLeft')) + parseFloat(shortjs.css(el, 'marginRight'));
+        return width;
+    };
+    shortjs.height = (el, includePadding = false, includeBorder = false, includeMargin = false) => {
+        if (!el) return 0;
+        let height = el.offsetHeight;
+        if (includePadding) height += parseFloat(shortjs.css(el, 'paddingTop')) + parseFloat(shortjs.css(el, 'paddingBottom'));
+        if (includeBorder) height += parseFloat(shortjs.css(el, 'borderTopWidth')) + parseFloat(shortjs.css(el, 'borderBottomWidth'));
+        if (includeMargin) height += parseFloat(shortjs.css(el, 'marginTop')) + parseFloat(shortjs.css(el, 'marginBottom'));
+        return height;
+    };
+    shortjs.containsEl = (parent, child) => parent && child && parent.contains(child);
 
-    /**
-     * Appends a child element to a parent element.
-     * @param {Element} parent - The parent element.
-     * @param {Element|string} child - The child element or a string to be appended as text.
-     */
-    short.append = function(parent, child) {
-        if (parent && child) {
-            if (typeof child === 'string') {
-                parent.appendChild(document.createTextNode(child));
-            } else {
-                parent.appendChild(child);
+    // II. Event Handling
+    shortjs.on = (el, e, h, o = {}) => el && el.addEventListener(e, h, o);
+    shortjs.off = (el, e, h, o = {}) => el && el.removeEventListener(e, h, o);
+    shortjs.ready = (h) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', h) : h();
+    shortjs.trigger = (el, e, d = {}) => el && el.dispatchEvent(new CustomEvent(e, { detail: d, bubbles: true, cancelable: true }));
+    shortjs.delegate = (p, e, s, h) => p && p.addEventListener(e, function(evt) { if (evt.target.matches(s)) h.call(evt.target, evt); });
+    shortjs.once = (el, e, h, o = {}) => { // Attaches an event listener that fires only once
+        const handler = (evt) => { h.call(el, evt); shortjs.off(el, e, handler, o); };
+        shortjs.on(el, e, handler, o);
+    };
+
+    // III. Array Utilities
+    shortjs.each = (arr, cb) => arr && typeof cb === 'function' && Array.prototype.forEach.call(arr, cb);
+    shortjs.map = (arr, cb) => arr && typeof cb === 'function' ? Array.prototype.map.call(arr, cb) : [];
+    shortjs.filter = (arr, cb) => arr && typeof cb === 'function' ? Array.prototype.filter.call(arr, cb) : [];
+    shortjs.reduce = (arr, cb, init) => arr && typeof cb === 'function' ? Array.prototype.reduce.call(arr, cb, init) : undefined;
+    shortjs.unique = (arr) => arr ? [...new Set(arr)] : [];
+    shortjs.flatten = (arr) => arr ? arr.flat(Infinity) : [];
+    shortjs.contains = (arr, val) => arr ? arr.includes(val) : false;
+    shortjs.first = (arr) => arr && arr.length > 0 ? arr[0] : undefined;
+    shortjs.last = (arr) => arr && arr.length > 0 ? arr[arr.length - 1] : undefined;
+    shortjs.removeAtIndex = (arr, index) => arr && Array.isArray(arr) ? arr.splice(index, 1) : arr;
+    shortjs.removeValue = (arr, val) => arr && Array.isArray(arr) ? arr.filter(item => item !== val) : arr;
+    shortjs.chunk = (arr, size) => { // Divides an array into smaller chunks
+        const chunkedArr = [];
+        for (let i = 0; i < arr.length; i += size) chunkedArr.push(arr.slice(i, i + size));
+        return chunkedArr;
+    };
+    shortjs.shuffle = (arr) => { // Shuffles an array in place
+        let currentIndex = arr.length,
+            randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+        }
+        return arr;
+    };
+
+    // IV. Object Utilities
+    shortjs.keys = (obj) => obj ? Object.keys(obj) : [];
+    shortjs.values = (obj) => obj ? Object.values(obj) : [];
+    shortjs.entries = (obj) => obj ? Object.entries(obj) : [];
+    shortjs.extend = (...objs) => Object.assign({}, ...objs);
+    shortjs.deepMerge = (target, ...sources) => {
+        if (typeof target !== 'object' || target === null) return target;
+        for (const source of sources) {
+            if (typeof source === 'object' && source !== null) {
+                for (const key in source) {
+                    if (Object.prototype.hasOwnProperty.call(source, key)) {
+                        if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+                            if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+                            shortjs.deepMerge(target[key], source[key]);
+                        } else {
+                            target[key] = source[key];
+                        }
+                    }
+                }
             }
         }
+        return target;
     };
-
-    /**
-     * Removes an element from the DOM.
-     * @param {Element} element - The element to remove.
-     */
-    short.remove = function(element) {
-        if (element && element.parentNode) {
-            element.parentNode.removeChild(element);
-        }
-    };
-
-    /**
-     * Adds one or more class names to an element.
-     * @param {Element} element - The target element.
-     * @param {string|string[]} classNames - A single class name string or an array of class names.
-     */
-    short.addClass = function(element, classNames) {
-        if (element) {
-            if (Array.isArray(classNames)) {
-                element.classList.add(...classNames);
-            } else {
-                element.classList.add(classNames);
-            }
-        }
-    };
-
-    /**
-     * Removes one or more class names from an element.
-     * @param {Element} element - The target element.
-     * @param {string|string[]} classNames - A single class name string or an array of class names.
-     */
-    short.removeClass = function(element, classNames) {
-        if (element) {
-            if (Array.isArray(classNames)) {
-                element.classList.remove(...classNames);
-            } else {
-                element.classList.remove(classNames);
-            }
-        }
-    };
-
-    /**
-     * Toggles a class name on an element.
-     * @param {Element} element - The target element.
-     * @param {string} className - The class name to toggle.
-     * @param {boolean} [force] - If true, adds the class; if false, removes it.
-     * @returns {boolean} True if the class is now present, false otherwise.
-     */
-    short.toggleClass = function(element, className, force) {
-        if (element) {
-            return element.classList.toggle(className, force);
-        }
+    shortjs.isEmpty = (obj) => {
+        if (obj === null || obj === undefined) return true;
+        if (Array.isArray(obj) || typeof obj === 'string') return obj.length === 0;
+        if (typeof obj === 'object') return Object.keys(obj).length === 0;
         return false;
     };
+    shortjs.hasOwn = (obj, prop) => obj ? Object.prototype.hasOwnProperty.call(obj, prop) : false;
+    shortjs.clone = (obj) => { // Deep clones an object or array
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(item => shortjs.clone(item));
+        const cloned = {};
+        for (const key in obj) {
+            if (shortjs.hasOwn(obj, key)) {
+                cloned[key] = shortjs.clone(obj[key]);
+            }
+        }
+        return cloned;
+    };
 
-    /**
-     * Sets or gets the innerHTML of an element.
-     * @param {Element} element - The target element.
-     * @param {string} [content] - The HTML string to set. If omitted, returns the current innerHTML.
-     * @returns {string|void} The innerHTML if getting, or void if setting.
-     */
-    short.html = function(element, content) {
-        if (!element) return '';
-        if (content === undefined) {
-            return element.innerHTML;
+    // V. String Utilities
+    shortjs.trim = (s) => s ? s.trim() : '';
+    shortjs.capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+    shortjs.lower = (s) => s ? s.toLowerCase() : '';
+    shortjs.upper = (s) => s ? s.toUpperCase() : '';
+    shortjs.containsStr = (s, sub) => s ? s.includes(sub) : false;
+    shortjs.slugify = (s) => s ? s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').replace(/--+/g, '-') : '';
+    shortjs.startsWith = (s, sub) => s ? s.startsWith(sub) : false;
+    shortjs.endsWith = (s, sub) => s ? s.endsWith(sub) : false;
+    shortjs.truncate = (s, length, ellipsis = '...') => { // Truncates a string
+        if (!s || s.length <= length) return s;
+        return s.slice(0, length) + ellipsis;
+    };
+    shortjs.camelCase = (s) => s ? s.replace(/-(\w)/g, (_, c) => c.toUpperCase()) : '';
+    shortjs.kebabCase = (s) => s ? s.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase() : '';
+
+    // VI. Number & Math Utilities
+    shortjs.rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    shortjs.clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+    shortjs.isNum = (v) => typeof v === 'number' && isFinite(v);
+    shortjs.isEven = (n) => shortjs.isNum(n) && n % 2 === 0;
+    shortjs.isOdd = (n) => shortjs.isNum(n) && n % 2 !== 0;
+    shortjs.round = (num, decimals = 0) => { // Rounds a number to a specified number of decimal places
+        const factor = 10 ** decimals;
+        return Math.round(num * factor) / factor;
+    };
+    shortjs.sum = (arr) => arr && Array.isArray(arr) ? arr.reduce((acc, val) => acc + (shortjs.isNum(val) ? val : 0), 0) : 0;
+    shortjs.average = (arr) => arr && Array.isArray(arr) && arr.length > 0 ? shortjs.sum(arr) / arr.length : 0;
+
+    // VII. Date & Time Utilities
+    shortjs.now = () => Date.now();
+    shortjs.formatDate = (d, opt = {}) => {
+        try { return new Date(d).toLocaleDateString(opt.locale || undefined, opt.options); } catch (e) { return ''; }
+    };
+    shortjs.formatTime = (d, opt = {}) => {
+        try { return new Date(d).toLocaleTimeString(opt.locale || undefined, opt.options); } catch (e) { return ''; }
+    };
+    shortjs.addDays = (date, days) => { // Adds days to a date
+        const d = new Date(date);
+        d.setDate(d.getDate() + days);
+        return d;
+    };
+    shortjs.diffDays = (date1, date2) => { // Calculates the difference in days between two dates
+        const diffTime = Math.abs(new Date(date2).getTime() - new Date(date1).getTime());
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    };
+
+    // VIII. Local Storage & Session Storage
+    shortjs.lsSet = (k, v) => {
+        try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* silent error */ }
+    };
+    shortjs.lsGet = (k) => {
+        try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; }
+    };
+    shortjs.lsRemove = (k) => localStorage.removeItem(k);
+    shortjs.lsClear = () => localStorage.clear();
+    shortjs.ssSet = (k, v) => {
+        try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* silent error */ }
+    };
+    shortjs.ssGet = (k) => {
+        try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; }
+    };
+    shortjs.ssRemove = (k) => sessionStorage.removeItem(k);
+    shortjs.ssClear = () => sessionStorage.clear();
+
+    // IX. Network & Async Operations
+    shortjs.ajax = (url, options = {}) => fetch(url, options);
+    shortjs.getJson = async (url, options = {}) => {
+        const res = await fetch(url, options);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+    };
+    shortjs.postJson = async (url, data, options = {}) => {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...options.headers },
+            body: JSON.stringify(data),
+            ...options
+        });
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+    };
+    shortjs.delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    shortjs.toPromise = (fn, context) => (...args) => new Promise((resolve, reject) => {
+        fn.apply(context, [...args, (err, result) => err ? reject(err) : resolve(result)]);
+    });
+    shortjs.get = async (url, options = {}) => { // Generic GET request
+        const res = await fetch(url, options);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.text();
+    };
+    shortjs.post = async (url, data, options = {}) => { // Generic POST request
+        const res = await fetch(url, {
+            method: 'POST',
+            body: data,
+            ...options
+        });
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.text();
+    };
+
+    // X. URL & Browser Utilities
+    shortjs.getParam = (name, url = window.location.href) => {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    };
+    shortjs.redirect = (url, newTab = false) => newTab ? window.open(url, '_blank') : (window.location.href = url);
+    shortjs.cookieSet = (name, value, days) => {
+        let expires = '';
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + (value || '') + expires + '; path=/';
+    };
+    shortjs.cookieGet = (name) => {
+        const nameEQ = name + '=';
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    };
+    shortjs.cookieRemove = (name) => shortjs.cookieSet(name, '', -1);
+    shortjs.clipboardCopy = (text) => {
+        // Uses modern Clipboard API if available, falls back to textarea method
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(() => { /* silent error */ });
         } else {
-            element.innerHTML = content;
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try { document.execCommand('copy'); } catch (err) { /* silent error */ }
+            document.body.removeChild(textArea);
         }
     };
+    shortjs.isOnline = () => navigator.onLine;
+    shortjs.userAgent = () => navigator.userAgent;
+    shortjs.isMobile = () => /Mobi|Android/i.test(navigator.userAgent);
+    shortjs.getHash = () => window.location.hash.substring(1);
+    shortjs.setHash = (hash) => window.location.hash = hash;
 
-    /**
-     * Sets or gets the textContent of an element.
-     * @param {Element} element - The target element.
-     * @param {string} [content] - The text string to set. If omitted, returns the current textContent.
-     * @returns {string|void} The textContent if getting, or void if setting.
-     */
-    short.text = function(element, content) {
-        if (!element) return '';
-        if (content === undefined) {
-            return element.textContent;
-        } else {
-            element.textContent = content;
-        }
+    // XI. Animation & Visual Utilities
+    shortjs.fadeIn = (el, duration = 400) => {
+        if (!el) return;
+        el.style.opacity = 0;
+        el.style.display = 'block';
+        let start = null;
+        const animate = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            el.style.opacity = Math.min(progress / duration, 1);
+            if (progress < duration) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
     };
-
-    /**
-     * Sets or gets an attribute of an element.
-     * @param {Element} element - The target element.
-     * @param {string} name - The name of the attribute.
-     * @param {string} [value] - The value to set the attribute to. If omitted, returns the current attribute value.
-     * @returns {string|null|void} The attribute value if getting, or void if setting.
-     */
-    short.attr = function(element, name, value) {
-        if (!element) return null;
-        if (value === undefined) {
-            return element.getAttribute(name);
-        } else {
-            element.setAttribute(name, value);
-        }
+    shortjs.fadeOut = (el, duration = 400) => {
+        if (!el) return;
+        el.style.opacity = 1;
+        let start = null;
+        const animate = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            el.style.opacity = Math.max(1 - (progress / duration), 0);
+            if (progress < duration) requestAnimationFrame(animate);
+            else el.style.display = 'none';
+        };
+        requestAnimationFrame(animate);
     };
-
-    /**
-     * ======================================
-     * 3. Event Handling Utilities
-     * ======================================
-     */
-
-    /**
-     * Adds an event listener to an element.
-     * @param {EventTarget} element - The element to attach the listener to.
-     * @param {string} eventName - The name of the event (e.g., 'click', 'mouseover').
-     * @param {Function} handler - The event handler function.
-     * @param {boolean|AddEventListenerOptions} [options={}] - Options for addEventListener.
-     */
-    short.on = function(element, eventName, handler, options = {}) {
-        if (element) {
-            element.addEventListener(eventName, handler, options);
-        }
+    shortjs.scrollTo = (target, duration = 500, offset = 0) => {
+        const el = typeof target === 'string' ? shortjs.qs(target) : target;
+        if (!el) return;
+        const startPos = window.pageYOffset;
+        const endPos = el.getBoundingClientRect().top + window.pageYOffset - offset;
+        const distance = endPos - startPos;
+        let startTime = null;
+        const animateScroll = (currentTime) => {
+            if (!startTime) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const run = easeInOutQuad(timeElapsed, startPos, distance, duration);
+            window.scrollTo(0, run);
+            if (timeElapsed < duration) requestAnimationFrame(animateScroll);
+        };
+        const easeInOutQuad = (t, b, c, d) => {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        };
+        requestAnimationFrame(animateScroll);
     };
+    shortjs.show = (el, display = 'block') => el && (el.style.display = display); // Sets element display to block or specified
+    shortjs.hide = (el) => el && (el.style.display = 'none'); // Hides an element
 
-    /**
-     * Removes an event listener from an element.
-     * @param {EventTarget} element - The element to remove the listener from.
-     * @param {string} eventName - The name of the event.
-     * @param {Function} handler - The event handler function to remove.
-     * @param {boolean|EventListenerOptions} [options={}] - Options for removeEventListener.
-     */
-    short.off = function(element, eventName, handler, options = {}) {
-        if (element) {
-            element.removeEventListener(eventName, handler, options);
-        }
-    };
-
-    /**
-     * Executes a function when the DOM is fully loaded.
-     * @param {Function} handler - The function to execute.
-     */
-    short.ready = function(handler) {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', handler);
-        } else {
-            handler();
-        }
-    };
-
-    /**
-     * ======================================
-     * 4. Utility Functions
-     * ======================================
-     */
-
-    /**
-     * A shorthand for console.log().
-     * @param {...any} args - Arguments to log to the console.
-     */
-    short.log = function(...args) {
-        console.log(...args);
-    };
-
-    /**
-     * Iterates over an array-like object (e.g., Array, NodeList) and calls a callback function for each item.
-     * @param {ArrayLike<any>} arrayLike - The array-like object to iterate over.
-     * @param {Function} callback - The function to call for each item (item, index, array).
-     */
-    short.each = function(arrayLike, callback) {
-        if (arrayLike && typeof callback === 'function') {
-            Array.prototype.forEach.call(arrayLike, callback);
-        }
-    };
-
-    /**
-     * A basic wrapper for the Fetch API.
-     * @param {string} url - The URL to fetch.
-     * @param {Object} [options={}] - Fetch API options (method, headers, body, etc.).
-     * @returns {Promise<Response>} A Promise that resolves to the Response object.
-     */
-    short.ajax = function(url, options = {}) {
-        return fetch(url, options);
-    };
-
-    /**
-     * Returns a function that, when invoked, will only be triggered at most once during a given window of time.
-     * @param {Function} func - The function to debounce.
-     * @param {number} delay - The delay in milliseconds.
-     * @returns {Function} The debounced function.
-     */
-    short.debounce = function(func, delay) {
+    // XII. Debounce & Throttle
+    shortjs.debounce = (func, delay) => { // Delays function execution
         let timeout;
         return function(...args) {
             const context = this;
@@ -294,14 +367,7 @@
             timeout = setTimeout(() => func.apply(context, args), delay);
         };
     };
-
-    /**
-     * Returns a function that, when invoked, will only be triggered at most once during a given window of time.
-     * @param {Function} func - The function to throttle.
-     * @param {number} delay - The delay in milliseconds.
-     * @returns {Function} The throttled function.
-     */
-    short.throttle = function(func, delay) {
+    shortjs.throttle = (func, delay) => { // Limits function execution rate
         let inThrottle, lastFn, lastTime;
         return function() {
             const context = this,
@@ -322,8 +388,23 @@
         };
     };
 
-    // Expose the 'short' object globally
-    if (typeof window !== 'undefined') {
-        window.short = short;
-    }
+    // XIII. Type Checking
+    shortjs.isString = (v) => typeof v === 'string' || v instanceof String;
+    shortjs.isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+    shortjs.isArray = (v) => Array.isArray(v);
+    shortjs.isFunction = (v) => typeof v === 'function';
+    shortjs.isBoolean = (v) => typeof v === 'boolean';
+    shortjs.isUndefined = (v) => typeof v === 'undefined';
+    shortjs.isNull = (v) => v === null;
+    shortjs.isDefined = (v) => typeof v !== 'undefined' && v !== null;
+
+    // XIV. Utility/Helper Functions
+    shortjs.noop = () => {}; // A no-operation function
+    shortjs.pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x); // Pipes a value through multiple functions
+    shortjs.compose = (...fns) => (x) => fns.reduceRight((v, f) => f(v), x); // Composes functions from right to left
+    shortjs.toArray = (collection) => Array.from(collection); // Converts HTMLCollection/NodeList to Array
+    shortjs.isEmptyObject = (obj) => Object.keys(obj).length === 0 && obj.constructor === Object;
+
+    // Expose the 'shortjs' object globally
+    if (typeof window !== 'undefined') window.shortjs = shortjs;
 })();
